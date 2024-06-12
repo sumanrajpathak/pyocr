@@ -1,11 +1,11 @@
 from fastapi import FastAPI, File, UploadFile
-from PIL import Image, ImageEnhance, ImageFilter, ImageOps
-import pytesseract
-import io
-import cv2
+# from PIL import Image, ImageEnhance, ImageFilter, ImageOps
+# import pytesseract
+# import io
+# import cv2
 import numpy as np
 import re
-from pyzxing import BarCodeReader
+# from pyzxing import BarCodeReader
 from typing import Dict, List
 import easyocr
 # from pyzbar.pyzbar import decode
