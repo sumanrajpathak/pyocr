@@ -1,45 +1,44 @@
-from fastapi import FastAPI, File, UploadFile
-from PIL import Image
-# ImageEnhance, ImageFilter, ImageOps
-# import pytesseract
-import io
-# import cv2
-import numpy as np
-import re
-# from pyzxing import BarCodeReader
-# from typing import Dict, List
-import easyocr
-# from pyzbar.pyzbar import decode
-from fastapi.responses import JSONResponse
-app = FastAPI()
+# from fastapi import FastAPI, File, UploadFile
+# from PIL import Image
+# # ImageEnhance, ImageFilter, ImageOps
+# # import pytesseract
+# import io
+# # import cv2
+# import numpy as np
+# import re
+# # from pyzxing import BarCodeReader
+# # from typing import Dict, List
+# import easyocr
+# # from pyzbar.pyzbar import decode
+# from fastapi.responses import JSONResponse
+# app = FastAPI()
 
-reader = easyocr.Reader(['en'])  
-pattern = re.compile(r'\b\w{5}-\w{3}-\w{4}\b')
+# reader = easyocr.Reader(['en'])  
+# pattern = re.compile(r'\b\w{5}-\w{3}-\w{4}\b')
 
-@app.post("/extract-text/")
-async def extract_text(file: UploadFile = File(...)):
-    try:
-        contents = await file.read()
+# @app.post("/extract-text/")
+# async def extract_text(file: UploadFile = File(...)):
+#     try:
+#         contents = await file.read()
 
-        image = Image.open(io.BytesIO(contents))
+#         image = Image.open(io.BytesIO(contents))
 
-        results = reader.readtext(np.array(image))
+#         results = reader.readtext(np.array(image))
 
-        # Format the results
-        matched_texts = []
-        for (bbox, text, prob) in results:
-            matches = pattern.findall(text)
-            for match in matches:
-                # matched_texts.append({
-                #     "matched_text": match,
-                #     "bbox":  [int(coord) for point in bbox for coord in point],
-                #     "probability": float(prob)  # 
-                # })
-                return {"extracted text: ": match}
+#         # Format the results
+#         matched_texts = []
+#         for (bbox, text, prob) in results:
+#             matches = pattern.findall(text)
+#             for match in matches:
+#                 # matched_texts.append({
+#                 #     "matched_text": match,
+#                 #     "bbox":  [int(coord) for point in bbox for coord in point],
+#                 #     "probability": float(prob)  # 
+#                 # })
+#                 return {"extracted text: ": match}
 
-        # return JSONResponse(content=matched_texts)
-    except Exception as e:
-        return JSONResponse(content={"error": str(e)}, status_code=500) 
+#     except Exception as e:
+#         return JSONResponse(content={"error": str(e)}, status_code=500) 
     
 # def preprocess_image(image: Image.Image) -> np.ndarray:
 #     try:
@@ -117,6 +116,6 @@ async def extract_text(file: UploadFile = File(...)):
 
 
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app)
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run(app)

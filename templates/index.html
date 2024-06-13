@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Text Extractor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="file"] {
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result, .loading, .uploaded-image {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            white-space: pre-wrap; /* preserve formatting */
+        }
+        .loading {
+            display: none;
+        }
+        .uploaded-image {
+            display: none;
+            max-width: 400px; /* Fixed width */
+            max-height: 400px; /* Fixed height */
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>OCR Code Extractor</h1>
+
+    <form id="upload-form">
+        <input type="file" id="file-input" accept="image/*" required>
+        <span id="filename" class="filename"></span>
+        <button type="submit">Upload</button>
+    </form>
+
+    <img id="uploaded-image" class="uploaded-image" src="" alt="Uploaded Image">
+
+    <div id="loading" class="loading">Loading...</div>
+    <div id="result" class="result hidden"></div>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const fileInput = document.getElementById('file-input');
+            if (!fileInput.files.length) return;
+
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const loadingDiv = document.getElementById('loading');
+            const resultDiv = document.getElementById('result');
+            const uploadedImage = document.getElementById('uploaded-image');
+
+            loadingDiv.style.display = 'block';
+            resultDiv.classList.add('hidden');
+            uploadedImage.style.display = 'none';
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                uploadedImage.src = e.target.result;
+                uploadedImage.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+
+            try {
+                const response = await fetch('/extract-text/', {
+                    method: 'POST',
+                    body: formData
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.data) {
+                        resultDiv.innerText = "Extracted text:\n" + result.data;
+                        resultDiv.classList.remove('hidden');
+                    } else {
+                        resultDiv.innerText = 'No text matched the pattern.';
+                        resultDiv.classList.remove('hidden');
+                    }
+                } else {
+                    const errorResult = await response.json();
+                    resultDiv.innerText = 'Error: ' + JSON.stringify(errorResult, null, 2);
+                    resultDiv.classList.remove('hidden');
+                }
+
+            } catch (error) {
+                resultDiv.innerText = 'Error: ' + error.message;
+                resultDiv.classList.remove('hidden');
+            } finally {
+                loadingDiv.style.display = 'none';
+            }
+        });
+    </script>
+
+</body>
+</html>
